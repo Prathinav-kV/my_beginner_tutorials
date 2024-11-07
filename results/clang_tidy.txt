@@ -1,4 +1,2 @@
 22:03:49 ~/SEM3/ENPM700/ros_ass/my_beginner_tutorials/src (ros_pub_sub *%) $ clang-format -style=Google -i publisher_member_function.cpp
-
 22:03:51 ~/SEM3/ENPM700/ros_ass/my_beginner_tutorials/src (ros_pub_sub *%) $ clang-format -style=Google -i subscriber_member_function.cpp
-
