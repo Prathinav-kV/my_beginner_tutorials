@@ -1,0 +1,3 @@
+22:04:14 ~/SEM3/ENPM700/ros_ass/my_beginner_tutorials (ros_pub_sub *%) $ cpplint --filter="-legal/copyright" $( find . -name *.cpp | grep -v "/build/" )
+Done processing ./src/publisher_member_function.cpp
+Done processing ./src/subscriber_member_function.cpp
