@@ -3,7 +3,7 @@
 <package format="3">
   <name>beginner_tutorials</name>
   <version>0.0.0</version>
-  <description>ROS publisher and subscriber</description>
+  <description>ROS Service Logging and Launch</description>
   <maintainer email="prathinav.kv@gmail.com">pratkv</maintainer>
   <license>Apache License 2.0</license>
 
