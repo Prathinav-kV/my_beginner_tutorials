@@ -10,13 +10,13 @@ def generate_launch_description():
     b_arg = DeclareLaunchArgument('b', default_value='20', description='Second integer to add')
 
     add_service_node = Node(
-        package='add_two_ints_package',
+        package='beginner_tutorials',
         executable='add_two_ints_service',
         name='add_two_ints_service'
     )
 
     add_client_node = Node(
-        package='add_two_ints_package',
+        package='beginner_tutorials',
         executable='add_two_ints_client',
         name='add_two_ints_client',
         arguments=[LaunchConfiguration('a'), LaunchConfiguration('b')]
