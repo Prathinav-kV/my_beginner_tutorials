@@ -1,0 +1,5 @@
+18:50:06 ~/SEM3/ENPM700/ros_ass/my_beginner_tutorials (ros_services_logging_launch *%) $ cpplint --filter="-legal/copyright" $( find . -name *.cpp | grep -v "/build/" )
+Done processing ./src/add_two_ints_client.cpp
+Done processing ./src/add_two_ints_service.cpp
+Done processing ./src/publisher_member_function.cpp
+Done processing ./src/subscriber_member_function.cpp

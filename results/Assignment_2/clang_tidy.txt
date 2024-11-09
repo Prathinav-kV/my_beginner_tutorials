@@ -1,0 +1,3 @@
+18:47:21 ~/SEM3/ENPM700/ros_ass/my_beginner_tutorials/src (ros_services_logging_launch *%) $ clang-format -style=Google -i add_two_ints_service.cpp
+
+18:47:39 ~/SEM3/ENPM700/ros_ass/my_beginner_tutorials/src (ros_services_logging_launch *%) $ clang-format -style=Google -i add_two_ints_client.cpp
