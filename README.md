@@ -88,5 +88,5 @@ ros2 launch beginner_tutorials add_two_ints_launch.py a:=5 b:=10
 ```
 ## Summary
 
-With these steps, you should see the service node receiving requests and the client node receiving responses with the sum. This setup demonstrates basic service-client communication between nodes using the ROS 2 client library in C++.
+With these steps, you should see the talker node publishing messages, the listener node receiving them, and be able to control the publishing state with a service call. This setup demonstrates basic publisher-subscriber communication and service control in ROS 2, using the ROS 2 client library in C++.
 
