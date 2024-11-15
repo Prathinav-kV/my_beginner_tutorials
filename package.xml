@@ -3,7 +3,7 @@
 <package format="3">
   <name>beginner_tutorials</name>
   <version>0.0.0</version>
-  <description>ROS Service Logging and Launch</description>
+  <description>ROS TF2 Test and Bagging</description>
   <maintainer email="prathinav.kv@gmail.com">pratkv</maintainer>
   <license>Apache License 2.0</license>
 
@@ -13,6 +13,8 @@
   <depend>std_msgs</depend>
   <depend>example_interfaces</depend>
   <depend>std_srvs</depend>
+  <depend>tf2_ros</depend>
+  <depend>geometry_msgs</depend>
 
 
   <test_depend>ament_lint_auto</test_depend>
