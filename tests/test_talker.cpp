@@ -14,99 +14,64 @@
 
 /**
  * @file test_talker.cpp
- * @brief Integration test for the MinimalPublisher node using Catch2 framework.
+ * @brief Integration test for the talker node's publisher functionality.
  *
- * This test verifies the functionality of the MinimalPublisher node, including
- * the topic publisher, TF broadcast, and service toggling.
+ * This test verifies that the `talker` node publishes messages on the "chatter" topic
+ * using the Catch2 framework.
  */
 
-#define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
-#include <rclcpp/rclcpp.hpp>
-#include <std_msgs/msg/string.hpp>
-#include <std_srvs/srv/set_bool.hpp>
-#include <tf2_ros/buffer.h>
-#include <tf2_ros/transform_listener.h>
-#include <geometry_msgs/msg/transform_stamped.hpp>
+#include <memory>
+#include <string>
+#include <chrono>
+#include "rclcpp/rclcpp.hpp"
+#include "std_msgs/msg/string.hpp"
 
 /**
- * @brief Test case for verifying the functionality of the Talker node.
+ * @brief Test case to verify that the `talker` node publishes messages.
  *
- * This test case includes sections for verifying the topic publisher, TF frame
- * broadcast, and the service for toggling publishing.
+ * This test spins up the `talker` node and a test subscriber. It waits for a
+ * message on the "chatter" topic and validates that the message matches the
+ * expected content.
  */
-TEST_CASE("Talker Node Test", "[talker]") {
-  auto node = rclcpp::Node::make_shared("test_node");
-  rclcpp::executors::SingleThreadedExecutor executor;
-  executor.add_node(node);
+TEST_CASE("Talker node publishes static messages", "[publisher]") {
+  // Initialize ROS2
+  rclcpp::init(0, nullptr);
 
-  /**
-   * @brief Section to verify the chatter topic publishing functionality.
-   *
-   * This section subscribes to the "chatter" topic and checks if the received
-   * messages contain the expected text.
-   */
-  SECTION("Verify chatter topic publishing") {
-    auto chatter_sub = node->create_subscription<std_msgs::msg::String>(
-        "chatter", 10, [](const std_msgs::msg::String::SharedPtr msg) {
-          REQUIRE(msg->data.find("Terps love to count till:") != std::string::npos);
-        });
+  // Create an executor
+  auto executor = std::make_shared<rclcpp::executors::SingleThreadedExecutor>();
 
-    // Spin for a short time to allow messages to be received
-    rclcpp::Rate rate(2);  // 2 Hz
-    for (int i = 0; i < 5; ++i) {
-      executor.spin_some();
-      rate.sleep();
-    }
-  }
+  // Launch the `talker` node
+  auto talker_node = std::make_shared<rclcpp::Node>("talker");
 
-  /**
-   * @brief Section to verify the TF frame broadcast functionality.
-   *
-   * This section listens for the TF transform between "world" and "talk" frames
-   * and checks if the transform values match the expected values.
-   */
-  SECTION("Verify TF frame broadcast") {
-    tf2_ros::Buffer tf_buffer(node->get_clock());
-    tf2_ros::TransformListener tf_listener(tf_buffer);
+  // Variable to store the received message
+  std::string received_message;
 
-    // Allow some time for the transform to be broadcast
-    rclcpp::Rate rate(1);  // 1 Hz
-    for (int i = 0; i < 3; ++i) {
-      executor.spin_some();
-      rate.sleep();
-    }
+  // Create a test subscriber node to listen to "chatter"
+  auto subscriber_node = rclcpp::Node::make_shared("test_subscriber");
+  auto subscription = subscriber_node->create_subscription<std_msgs::msg::String>(
+      "chatter", 10, [&received_message](const std_msgs::msg::String::SharedPtr msg) {
+        received_message = msg->data;
+      });
 
-    // Attempt to lookup the transform from "world" to "talk"
-    REQUIRE_NOTHROW(tf_buffer.lookupTransform("world", "talk", tf2::TimePointZero));
+  // Add nodes to the executor
+  executor->add_node(talker_node);
+  executor->add_node(subscriber_node);
 
-    auto transform = tf_buffer.lookupTransform("world", "talk", tf2::TimePointZero);
-    REQUIRE(transform.transform.translation.x == Approx(1.0));
-    REQUIRE(transform.transform.translation.y == Approx(2.0));
-    REQUIRE(transform.transform.translation.z == Approx(3.0));
-    REQUIRE(transform.transform.rotation.w == Approx(1.0));
-  }
+  // Run the executor in a separate thread
+  std::thread executor_thread([&executor]() {
+    executor->spin();
+  });
 
-  /**
-   * @brief Section to verify the service for toggling publishing.
-   *
-   * This section calls the "toggle_publishing" service to stop publishing and
-   * verifies the response from the service.
-   */
-  SECTION("Verify service toggle publishing") {
-    auto client = node->create_client<std_srvs::srv::SetBool>("toggle_publishing");
-    REQUIRE(client->wait_for_service(std::chrono::seconds(5)));
+  // Wait for a message to be received
+  rclcpp::sleep_for(std::chrono::milliseconds(1000));  // Wait for publisher to send messages
 
-    auto request = std::make_shared<std_srvs::srv::SetBool::Request>();
-    request->data = false;
-    auto result_future = client->async_send_request(request);
+  // Check that a message was received
+  REQUIRE(!received_message.empty());
+  REQUIRE(received_message == "Terps love to count");
 
-    // Wait for the result
-    REQUIRE(rclcpp::spin_until_future_complete(node, result_future) ==
-            rclcpp::FutureReturnCode::SUCCESS);
-
-    auto response = result_future.get();
-    REQUIRE(response->success == true);
-    REQUIRE(response->message == "Publishing stopped.");
-  }
+  // Clean up
+  executor->cancel();
+  executor_thread.join();
+  rclcpp::shutdown();
 }

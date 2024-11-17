@@ -78,7 +78,6 @@ class MinimalPublisher : public rclcpp::Node {
   rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr service_;  ///< Service to toggle publishing on/off
   std::shared_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_; ///< TF broadcaster for broadcasting transforms
   rclcpp::TimerBase::SharedPtr tf_timer_; ///< Timer for broadcasting TF frames
-  size_t count_;        ///< Counter for messages published
   bool is_publishing_;  ///< Flag indicating whether publishing is active
 };
 
@@ -87,7 +86,7 @@ class MinimalPublisher : public rclcpp::Node {
  * @param frequency Frequency at which to publish messages (in Hz).
  */
 MinimalPublisher::MinimalPublisher(double frequency)
-    : Node("minimal_publisher"), count_(0), is_publishing_(true) {
+    : Node("minimal_publisher"), is_publishing_(true) {
   // Create publisher on "chatter" topic with a queue size of 10
   publisher_ = this->create_publisher<std_msgs::msg::String>("chatter", 10);
 
@@ -126,7 +125,7 @@ void MinimalPublisher::timer_callback() {
     return;
   }
   auto message = std_msgs::msg::String();
-  message.data = "Terps love to count till: " + std::to_string(count_++);
+  message.data = "Terps love to count";
   RCLCPP_INFO_STREAM(this->get_logger(),
                      "Publishing: '" << message.data << "'");
   publisher_->publish(message);
