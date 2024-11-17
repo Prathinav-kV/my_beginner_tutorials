@@ -20,11 +20,11 @@
  * topic using the Catch2 framework.
  */
 
-#include <catch2/catch.hpp>
 #include <memory>
 #include <string>
 #include <thread>  // NOLINT(build/c++11)
 
+#include <catch2/catch.hpp>
 #include "rclcpp/rclcpp.hpp"
 #include "std_msgs/msg/string.hpp"
 
