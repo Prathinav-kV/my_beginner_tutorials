@@ -16,14 +16,15 @@
  * @file test_talker.cpp
  * @brief Integration test for the talker node's publisher functionality.
  *
- * This test verifies that the `talker` node publishes messages on the "chatter" topic
- * using the Catch2 framework.
+ * This test verifies that the `talker` node publishes messages on the "chatter"
+ * topic using the Catch2 framework.
  */
 
 #include <catch2/catch.hpp>
 #include <memory>
 #include <string>
-#include <chrono>
+#include <thread>  // NOLINT(build/c++11)
+
 #include "rclcpp/rclcpp.hpp"
 #include "std_msgs/msg/string.hpp"
 
@@ -49,22 +50,23 @@ TEST_CASE("Talker node publishes static messages", "[publisher]") {
 
   // Create a test subscriber node to listen to "chatter"
   auto subscriber_node = rclcpp::Node::make_shared("test_subscriber");
-  auto subscription = subscriber_node->create_subscription<std_msgs::msg::String>(
-      "chatter", 10, [&received_message](const std_msgs::msg::String::SharedPtr msg) {
-        received_message = msg->data;
-      });
+  auto subscription =
+      subscriber_node->create_subscription<std_msgs::msg::String>(
+          "chatter", 10,
+          [&received_message](const std_msgs::msg::String::SharedPtr msg) {
+            received_message = msg->data;
+          });
 
   // Add nodes to the executor
   executor->add_node(talker_node);
   executor->add_node(subscriber_node);
 
   // Run the executor in a separate thread
-  std::thread executor_thread([&executor]() {
-    executor->spin();
-  });
+  std::thread executor_thread([&executor]() { executor->spin(); });
 
   // Wait for a message to be received
-  rclcpp::sleep_for(std::chrono::milliseconds(1000));  // Wait for publisher to send messages
+  std::this_thread::sleep_for(
+      std::chrono::milliseconds(1000));  // Wait for publisher to send messages
 
   // Check that a message was received
   REQUIRE(!received_message.empty());
