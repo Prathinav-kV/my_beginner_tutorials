@@ -22,24 +22,25 @@
  * this node broadcasts a TF frame "talk" with a parent frame "world".
  */
 
+#include <tf2_ros/transform_broadcaster.h>
+
 #include <functional>
 #include <memory>
 #include <string>
 
+#include <geometry_msgs/msg/transform_stamped.hpp>
 #include "rclcpp/rclcpp.hpp"
 #include "std_msgs/msg/string.hpp"
 #include "std_srvs/srv/set_bool.hpp"  // Include service header for SetBool
-#include <tf2_ros/transform_broadcaster.h>
-#include <geometry_msgs/msg/transform_stamped.hpp>
 
 /**
  * @class MinimalPublisher
  * @brief A simple publisher node that publishes a message on the "chatter"
  * topic.
  *
- * This class provides a service to toggle message publishing, broadcasts a TF frame, and logs
- * messages at different levels. The frequency of publishing can be specified
- * via a command-line argument.
+ * This class provides a service to toggle message publishing, broadcasts a TF
+ * frame, and logs messages at different levels. The frequency of publishing can
+ * be specified via a command-line argument.
  */
 class MinimalPublisher : public rclcpp::Node {
  public:
@@ -62,22 +63,27 @@ class MinimalPublisher : public rclcpp::Node {
    * publishing.
    * @param response Response with success status and message.
    */
-  void handle_service(const std_srvs::srv::SetBool::Request::SharedPtr request,
-                      const std_srvs::srv::SetBool::Response::SharedPtr response);
+  void handle_service(
+      const std_srvs::srv::SetBool::Request::SharedPtr request,
+      const std_srvs::srv::SetBool::Response::SharedPtr response);
 
   /**
    * @brief Broadcast a TF transform from "world" to "talk".
    *
-   * This function broadcasts a transform from the "world" frame to the "talk" frame.
-   * The transform has a non-zero translation and a neutral rotation.
+   * This function broadcasts a transform from the "world" frame to the "talk"
+   * frame. The transform has a non-zero translation and a neutral rotation.
    */
   void broadcast_transform();
 
-  rclcpp::TimerBase::SharedPtr timer_;  ///< Timer for scheduling publishing intervals
-  rclcpp::Publisher<std_msgs::msg::String>::SharedPtr publisher_;  ///< Publisher to publish messages
-  rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr service_;  ///< Service to toggle publishing on/off
-  std::shared_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_; ///< TF broadcaster for broadcasting transforms
-  rclcpp::TimerBase::SharedPtr tf_timer_; ///< Timer for broadcasting TF frames
+  rclcpp::TimerBase::SharedPtr
+      timer_;  ///< Timer for scheduling publishing intervals
+  rclcpp::Publisher<std_msgs::msg::String>::SharedPtr
+      publisher_;  ///< Publisher to publish messages
+  rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr
+      service_;  ///< Service to toggle publishing on/off
+  std::shared_ptr<tf2_ros::TransformBroadcaster>
+      tf_broadcaster_;  ///< TF broadcaster for broadcasting transforms
+  rclcpp::TimerBase::SharedPtr tf_timer_;  ///< Timer for broadcasting TF frames
   bool is_publishing_;  ///< Flag indicating whether publishing is active
 };
 
@@ -99,8 +105,8 @@ MinimalPublisher::MinimalPublisher(double frequency)
   // Create a service to toggle publishing
   service_ = this->create_service<std_srvs::srv::SetBool>(
       "toggle_publishing",
-      std::bind(&MinimalPublisher::handle_service, this,
-                std::placeholders::_1, std::placeholders::_2));
+      std::bind(&MinimalPublisher::handle_service, this, std::placeholders::_1,
+                std::placeholders::_2));
 
   // Create a TF broadcaster
   tf_broadcaster_ = std::make_shared<tf2_ros::TransformBroadcaster>(this);
@@ -137,12 +143,12 @@ void MinimalPublisher::timer_callback() {
  * publishing.
  * @param response Response with success status and message.
  */
-void MinimalPublisher::handle_service(const std_srvs::srv::SetBool::Request::SharedPtr request,
-                                      const std_srvs::srv::SetBool::Response::SharedPtr response) {
+void MinimalPublisher::handle_service(
+    const std_srvs::srv::SetBool::Request::SharedPtr request,
+    const std_srvs::srv::SetBool::Response::SharedPtr response) {
   if (request->data) {
     if (is_publishing_) {
-      RCLCPP_WARN_STREAM(this->get_logger(),
-                         "Publishing is already started.");
+      RCLCPP_WARN_STREAM(this->get_logger(), "Publishing is already started.");
       response->success = false;
       response->message = "Already publishing.";
     } else {
@@ -153,8 +159,7 @@ void MinimalPublisher::handle_service(const std_srvs::srv::SetBool::Request::Sha
     }
   } else {
     if (!is_publishing_) {
-      RCLCPP_WARN_STREAM(this->get_logger(),
-                         "Publishing is already stopped.");
+      RCLCPP_WARN_STREAM(this->get_logger(), "Publishing is already stopped.");
       response->success = false;
       response->message = "Already stopped.";
     } else {
@@ -169,8 +174,8 @@ void MinimalPublisher::handle_service(const std_srvs::srv::SetBool::Request::Sha
 /**
  * @brief Broadcast a TF transform from "world" to "talk".
  *
- * This function broadcasts a transform from the "world" frame to the "talk" frame.
- * The transform has a non-zero translation and a neutral rotation.
+ * This function broadcasts a transform from the "world" frame to the "talk"
+ * frame. The transform has a non-zero translation and a neutral rotation.
  */
 void MinimalPublisher::broadcast_transform() {
   geometry_msgs::msg::TransformStamped transformStamped;

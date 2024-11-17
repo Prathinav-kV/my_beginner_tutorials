@@ -1,0 +1,5 @@
+19:58:53 ~/700/my_beginner_tutorials/src (ros_tf2_unitTest_bagFiles) $ clang-format -style=Google -i publisher_member_function.cpp
+
+19:59:06 ~/700/my_beginner_tutorials/src (ros_tf2_unitTest_bagFiles *) $ clang-format -style=Google -i subscriber_member_function.cpp
+
+19:59:29 ~/700/my_beginner_tutorials/tests (ros_tf2_unitTest_bagFiles *) $ clang-format -style=Google -i test_talker.cpp

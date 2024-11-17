@@ -1,0 +1,4 @@
+20:20:16 ~/700/my_beginner_tutorials (ros_tf2_unitTest_bagFiles *%) $ cpplint --filter="-legal/copyright" $( find . -name *.cpp | grep -v "/build/" )
+Done processing ./src/publisher_member_function.cpp
+Done processing ./src/subscriber_member_function.cpp
+Done processing ./tests/test_talker.cpp
