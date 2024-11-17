@@ -1,51 +1,75 @@
-# Copyright 2024 Prathinav Karnala Venkata
-"""
-@file service_launch.py
-@brief Launch file to start the talker and listener nodes with configurable parameters.
- 
-This launch file initializes both the talker and listener nodes. The talker node's 
-frequency can be modified via command-line arguments.
-"""
+import os
 
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument
+from launch.actions import DeclareLaunchArgument, ExecuteProcess, TimerAction
+from launch.conditions import IfCondition
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
 
 def generate_launch_description():
     """
-    Generate the launch description to start talker and listener nodes.
+    Generate the launch description for the talker and listener nodes, and optionally record a bag file.
 
-    @return LaunchDescription Launch description object containing all the nodes and arguments.
+    @details
+    - Includes a launch argument `record` to enable or disable bag recording.
+    - Starts the talker and listener nodes.
+    - Records all topics to a bag file in the `results/bag_record` directory if `record` is enabled.
+    - Stops the recording automatically after 15 seconds.
+
+    @return LaunchDescription containing nodes, arguments, and processes for the launch file.
     """
-    
-    # Declare a launch argument for the publish frequency
-    frequency_arg = DeclareLaunchArgument(
-        'frequency', default_value='2.0',
-        description='Frequency for the talker node on /chatter topic (in Hz)'
-    )
+    # Declare argument for enabling/disabling recording
+    record_enabled = LaunchConfiguration('record', default='true')
+    bag_directory = os.path.join(os.getcwd(), 'results', 'bag_record')
 
-    # Use LaunchConfiguration to fetch the frequency argument value
-    frequency = LaunchConfiguration('frequency')
-
-    # Define the talker node with a parameter for frequency
-    talker_node = Node(
-        package='beginner_tutorials',
-        executable='talker',
-        name='talker',
-        parameters=[{'frequency': frequency}]
-    )
-
-    # Define the listener node
-    listener_node = Node(
-        package='beginner_tutorials',
-        executable='listener',
-        name='listener'
-    )
-
-    # Create the launch description with the nodes and the argument
     return LaunchDescription([
-        frequency_arg,
-        talker_node,
-        listener_node
+        # Launch argument for enabling/disabling recording
+        DeclareLaunchArgument(
+            'record',
+            default_value='true',
+            description='Enable or disable bag recording'
+        ),
+
+        # Talker node (publisher)
+        Node(
+            package='beginner_tutorials',
+            executable='talker',
+            name='talker',
+            parameters=[{'frequency': 2.0}],
+            output='screen'
+        ),
+
+        # Listener node (subscriber)
+        Node(
+            package='beginner_tutorials',
+            executable='listener',
+            name='listener',
+            output='screen'
+        ),
+
+        # Conditional bag recording
+        TimerAction(
+            period=0.0,  # Start immediately
+            actions=[
+                ExecuteProcess(
+                    condition=IfCondition(record_enabled),
+                    cmd=[
+                        'ros2', 'bag', 'record', '-a', '-o', bag_directory
+                    ],
+                    output='screen'
+                )
+            ]
+        ),
+
+        # Timer to stop the recording after ~15 seconds
+        TimerAction(
+            period=15.0,  # Stop after 15 seconds
+            actions=[
+                ExecuteProcess(
+                    condition=IfCondition(record_enabled),
+                    cmd=['killall', '-SIGINT', 'ros2'],
+                    output='screen'
+                )
+            ]
+        ),
     ])
