@@ -126,7 +126,7 @@ Use the launch file to record all topics into a bag file:
 ```bash
 ros2 launch beginner_tutorials service_launch.py record:=true
 ```
-Bag File Location: results/bag_record
+Bag File Location: ~ros_ws/results/bag_record
 Behavior:
 
 Records all topics, including /chatter.
