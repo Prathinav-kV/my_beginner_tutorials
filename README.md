@@ -57,8 +57,9 @@ source /opt/ros/humble/setup.bash
 Clone the repository and navigate to the project directory:
 
 ```bash
-git clone <repository-url>
-cd <repository-directory>
+cd ros_ws/src
+git clone https://github.com/Prathinav-kV/my_beginner_tutorials.git
+cd ~/ros_ws
 ```
 Build the project using colcon:
 
